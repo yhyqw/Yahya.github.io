@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>مكتبتي | My Media</title>
+    
+    <!-- PWA Meta & Manifest -->
+    <link rel="manifest" href="data:application/manifest+json,{
+        name: 'مكتبتي',
+        short_name: 'مكتبتي',
+        description: 'مكتبة الوسائط الشخصية',
+        theme_color: '#2563eb',
+        background_color: '#f1f5f9',
+        display: 'standalone',
+        orientation: 'portrait',
+        scope: './',
+        start_url: './',
+        icons: [{
+            src: 'https://cdn-icons-png.flaticon.com/512/716/716814.png',
+            sizes: '512x512',
+            type: 'image/png'
+        }]
+    }">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="مكتبتي">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/716/716814.png">
+    
+    <!-- الخطوط والأيقونات -->
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background: #f1f5f9;
+            color: #0f172a;
+            padding: 20px;
+            min-height: 100vh;
+            transition: background 0.3s, color 0.2s;
+        }
+
+        body.dark {
+            background: #0f172a;
+            color: #e2e8f0;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 32px;
+            padding: 28px 24px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+        }
+
+        body.dark .container {
+            background: rgba(30, 41, 59, 0.8);
+            border-color: #334155;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo i {
+            font-size: 2.2rem;
+            color: #2563eb;
+        }
+
+        .logo h1 {
+            font-size: 1.9rem;
+            font-weight: 800;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .theme-toggle, .install-btn {
+            background: #e2e8f0;
+            border: none;
+            border-radius: 60px;
+            padding: 12px 20px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: inherit;
+            transition: 0.2s;
+        }
+
+        .install-btn {
+            background: #059669;
+            color: white;
+            display: none;
+        }
+
+        .install-btn.show {
+            display: flex;
+        }
+
+        body.dark .theme-toggle {
+            background: #334155;
+            color: #f1f5f9;
+        }
+
+        .upload-zone {
+            background: #f8fafc;
+            border: 2px dashed #94a3b8;
+            border-radius: 24px;
+            padding: 40px 20px;
+            text-align: center;
+            margin-bottom: 30px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        body.dark .upload-zone {
+            background: #1e293b;
+            border-color: #475569;
+        }
+
+        .upload-zone:hover {
+            border-color: #2563eb;
+            background: #eff6ff;
+        }
+
+        .upload-zone i {
+            font-size: 3rem;
+            color: #2563eb;
+            margin-bottom: 12px;
+        }
+
+        .upload-zone p {
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+        }
+
+        .upload-zone .hint {
+            font-size: 0.9rem;
+            color: #64748b;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .search-wrapper {
+            display: flex;
+            align-items: center;
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-radius: 60px;
+            padding: 4px 4px 4px 18px;
+            flex: 1;
+            max-width: 400px;
+        }
+
+        body.dark .search-wrapper {
+            background: #0f172a;
+            border-color: #475569;
+        }
+
+        .search-wrapper input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            padding: 12px 0;
+            font-family: inherit;
+            outline: none;
+        }
+
+        .search-wrapper button {
+            background: #2563eb;
+            border: none;
+            color: white;
+            padding: 10px 18px;
+            border-radius: 60px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .stats {
+            background: #eef2ff;
+            padding: 10px 22px;
+            border-radius: 60px;
+            font-weight: 600;
+            display: flex;
+            gap: 20px;
+        }
+
+        body.dark .stats {
+            background: #1e3a8a;
+            color: #e2e8f0;
+        }
+
+        .files-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .file-item {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 20px;
+            padding: 16px 18px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        body.dark .file-item {
+            background: #1e293b;
+            border-color: #334155;
+        }
+
+        .uploading-item {
+            background: #eef2ff;
+            border-color: #2563eb;
+        }
+
+        .file-icon {
+            background: rgba(37, 99, 235, 0.06);
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #2563eb;
+            font-size: 1.5rem;
+        }
+
+        .file-info {
+            flex: 1;
+            min-width: 180px;
+        }
+
+        .file-name {
+            font-weight: 700;
+            margin-bottom: 5px;
+            word-break: break-word;
+        }
+
+        .file-meta {
+            display: flex;
+            gap: 20px;
+            font-size: 0.8rem;
+            color: #64748b;
+        }
+
+        body.dark .file-meta {
+            color: #94a3b8;
+        }
+
+        .progress-area {
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .progress-bar-bg {
+            flex: 1;
+            height: 8px;
+            background: #cbd5e1;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: #2563eb;
+            width: 0%;
+            transition: width 0.1s;
+        }
+
+        .progress-text {
+            font-size: 0.8rem;
+            font-weight: 600;
+            min-width: 45px;
+        }
+
+        .file-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn {
+            background: #f1f5f9;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 30px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.15s;
+            font-family: inherit;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            border: 1px solid transparent;
+        }
+
+        .btn-primary {
+            background: #2563eb;
+            color: white;
+        }
+
+        .btn-danger {
+            color: #dc2626;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+            color: white;
+        }
+
+        .btn-warning {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #d97706;
+        }
+
+        .empty-message {
+            text-align: center;
+            padding: 50px;
+            color: #64748b;
+            font-size: 1.2rem;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.82);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-content {
+            max-width: 900px;
+            width: 100%;
+            background: #0f172a;
+            border-radius: 24px;
+            padding: 20px;
+        }
+
+        .rename-modal .modal-content {
+            max-width: 450px;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            color: white;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: #ffffff;
+            font-size: 28px;
+            cursor: pointer;
+        }
+
+        .rename-input {
+            width: 100%;
+            padding: 14px 16px;
+            border-radius: 16px;
+            border: none;
+            font-family: inherit;
+            font-size: 1rem;
+            margin-bottom: 20px;
+            background: #1e293b;
+            color: white;
+            border: 1px solid #475569;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        #playerContainer video,
+        #playerContainer audio {
+            width: 100%;
+            border-radius: 16px;
+            max-height: 70vh;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px 16px;
+            }
+            .file-item {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .file-actions {
+                justify-content: flex-end;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- رأس الصفحة -->
+    <div class="header">
+        <div class="logo">
+            <i class="fas fa-photo-film"></i>
+            <h1>مكتبتي</h1>
+        </div>
+        <div class="header-actions">
+            <button class="install-btn" id="installBtn">
+                <i class="fas fa-download"></i>
+                تثبيت التطبيق
+            </button>
+            <button class="theme-toggle" id="themeToggle">
+                <i class="fas fa-moon"></i>
+                <span>الوضع الليلي</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- منطقة الرفع -->
+    <div class="upload-zone" id="uploadZone">
+        <i class="fas fa-cloud-upload-alt"></i>
+        <p>اسحب وأفلت ملفات الصوت والفيديو هنا</p>
+        <p class="hint">أو اضغط للاختيار</p>
+        <input type="file" id="fileInput" accept="audio/*,video/*" multiple>
+    </div>
+
+    <!-- شريط الأدوات -->
+    <div class="toolbar">
+        <div class="search-wrapper">
+            <input type="text" id="searchInput" placeholder="ابحث باسم الملف..." autocomplete="off">
+            <button id="searchBtn"><i class="fas fa-search"></i> بحث</button>
+        </div>
+        <div class="stats" id="statsDisplay">0 ملفات | 0 ميغابايت</div>
+    </div>
+
+    <!-- قائمة الملفات -->
+    <div id="filesListContainer" class="files-list"></div>
+</div>
+
+<!-- نافذة التشغيل -->
+<div class="modal" id="playerModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>تشغيل</h3>
+            <button class="close-btn" id="closeModalBtn">&times;</button>
+        </div>
+        <div id="playerContainer"></div>
+    </div>
+</div>
+
+<!-- نافذة تعديل الاسم -->
+<div class="modal rename-modal" id="renameModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>تعديل الاسم</h3>
+            <button class="close-btn" id="closeRenameModalBtn">&times;</button>
+        </div>
+        <input type="text" id="renameInput" class="rename-input" placeholder="الاسم الجديد" autocomplete="off">
+        <div class="modal-actions">
+            <button class="btn" id="cancelRenameBtn">إلغاء</button>
+            <button class="btn btn-primary" id="saveRenameBtn">حفظ</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        "use strict";
+
+        // ===================== PWA Installation =====================
+        let deferredPrompt;
+        const installBtn = document.getElementById('installBtn');
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            installBtn.classList.add('show');
+        });
+
+        installBtn.addEventListener('click', async () => {
+            if (!deferredPrompt) return;
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === 'accepted') {
+                installBtn.classList.remove('show');
+            }
+            deferredPrompt = null;
+        });
+
+        // Register a dummy service worker (only for PWA criteria, not functional)
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('data:application/javascript,self.addEventListener("fetch",e=>{})')
+                .catch(() => console.log('SW registration skipped (expected for data URL)'));
+        }
+
+        // ===================== Database & State =====================
+        const DB_NAME = 'MyMediaDB';
+        const STORE_NAME = 'files';
+        let db;
+        let mediaFiles = [];
+        let searchQuery = '';
+        let currentRenameId = null;
+
+        // DOM elements
+        const uploadZone = document.getElementById('uploadZone');
+        const fileInput = document.getElementById('fileInput');
+        const filesListContainer = document.getElementById('filesListContainer');
+        const searchInput = document.getElementById('searchInput');
+        const searchBtn = document.getElementById('searchBtn');
+        const statsDisplay = document.getElementById('statsDisplay');
+        const playerModal = document.getElementById('playerModal');
+        const playerContainer = document.getElementById('playerContainer');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        const themeToggle = document.getElementById('themeToggle');
+        const renameModal = document.getElementById('renameModal');
+        const renameInput = document.getElementById('renameInput');
+        const closeRenameModalBtn = document.getElementById('closeRenameModalBtn');
+        const cancelRenameBtn = document.getElementById('cancelRenameBtn');
+        const saveRenameBtn = document.getElementById('saveRenameBtn');
+
+        // ===================== Database Helpers =====================
+        async function openDB() {
+            return new Promise((resolve, reject) => {
+                const req = indexedDB.open(DB_NAME, 1);
+                req.onerror = () => reject(req.error);
+                req.onsuccess = () => {
+                    db = req.result;
+                    resolve(db);
+                };
+                req.onupgradeneeded = (e) => {
+                    const db = e.target.result;
+                    if (!db.objectStoreNames.contains(STORE_NAME)) {
+                        const store = db.createObjectStore(STORE_NAME, { keyPath: 'id' });
+                        store.createIndex('by_name', 'name');
+                    }
+                };
+            });
+        }
+
+ async function saveFile(fileData) {
+            if (!db) await openDB();
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction(STORE_NAME, 'readwrite');
+                const store = tx.objectStore(STORE_NAME);
+                const req = store.add(fileData);
+                req.onsuccess = () => resolve();
+                req.onerror = () => reject(req.error);
+            });
+        }
+
+        async function getAllFiles() {
+            if (!db) await openDB();
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction(STORE_NAME, 'readonly');
+                const store = tx.objectStore(STORE_NAME);
+                const req = store.getAll();
+                req.onsuccess = () => resolve(req.result);
+                req.onerror = () => reject(req.error);
+            });
+        }
+
+        async function deleteFileFromDB(id) {
+            if (!db) await openDB();
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction(STORE_NAME, 'readwrite');
+                const store = tx.objectStore(STORE_NAME);
+                const req = store.delete(id);
+                req.onsuccess = () => resolve();
+                req.onerror = () => reject(req.error);
+            });
+        }
+
+        async function updateFileNameInDB(id, newName) {
+            if (!db) await openDB();
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction(STORE_NAME, 'readwrite');
+                const store = tx.objectStore(STORE_NAME);
+                const getReq = store.get(id);
+                getReq.onsuccess = () => {
+                    const file = getReq.result;
+                    if (file) {
+                        file.name = newName;
+                        store.put(file);
+                        resolve();
+                    } else {
+                        reject('ملف غير موجود');
+                    }
+                };
+                getReq.onerror = () => reject(getReq.error);
+            });
+        }
+
+        async function updateFileProgress(id, currentTime) {
+            if (!db) await openDB();
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction(STORE_NAME, 'readwrite');
+                const store = tx.objectStore(STORE_NAME);
+                const getReq = store.get(id);
+                getReq.onsuccess = () => {
+                    const file = getReq.result;
+                    if (file) {
+                        file.progress = currentTime;
+                        store.put(file);
+                        resolve();
+                    } else {
+                        reject('ملف غير موجود');
+                    }
+                };
+                getReq.onerror = () => reject(getReq.error);
+            });
+        }
+
+        // ===================== Utilities =====================
+        function formatBytes(bytes) {
+            if (bytes === 0) return '0 B';
+            const k = 1024;
+            const sizes = ['B', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function formatDuration(seconds) {
+            if (!seconds || isNaN(seconds)) return '--:--';
+            const h = Math.floor(seconds / 3600);
+            const m = Math.floor((seconds % 3600) / 60);
+            const s = Math.floor(seconds % 60);
+            if (h > 0) {
+                return `${h}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+            }
+            return `${m}:${s.toString().padStart(2, '0')}`;
+        }
+
+        function getMediaDuration(file) {
+            return new Promise((resolve) => {
+                const url = URL.createObjectURL(file);
+                const el = file.type.startsWith('audio') ? new Audio() : document.createElement('video');
+                el.src = url;
+                el.onloadedmetadata = () => {
+                    resolve(el.duration || 0);
+                    URL.revokeObjectURL(url);
+                };
+                el.onerror = () => resolve(0);
+            });
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // ===================== UI Updates =====================
+        function updateStats() {
+            const total = mediaFiles.length;
+            const totalBytes = mediaFiles.reduce((sum, f) => sum + f.size, 0);
+            statsDisplay.textContent = `${total} ملف | ${formatBytes(totalBytes)}`;
+        }
+
+        function renderFilesList() {
+            let filtered = mediaFiles;
+            if (searchQuery.trim()) {
+                filtered = filtered.filter(f => f.name.toLowerCase().includes(searchQuery.toLowerCase()));
+            }
+            filtered.sort((a, b) => b.created - a.created);
+
+            if (filtered.length === 0) {
+                filesListContainer.innerHTML = `
+                    <div class="empty-message">
+                        <i class="fas fa-box-open" style="font-size:3rem; opacity:0.5; margin-bottom:15px; display:block;"></i>
+                        لا توجد ملفات. ارفع بعض المقاطع!
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '';
+            filtered.forEach(file => {
+                const icon = file.type.startsWith('audio') ? 'fa-headphones' : 'fa-video';
+                html += `
+                    <div class="file-item">
+                        <div class="file-icon"><i class="fas ${icon}"></i></div>
+                        <div class="file-info">
+                            <div class="file-name">${escapeHtml(file.name)}</div>
+                            <div class="file-meta">
+                                <span><i class="far fa-clock"></i> ${formatDuration(file.duration)} ${file.progress ? '▶️' : ''}</span>
+                                <span><i class="far fa-hdd"></i> ${formatBytes(file.size)}</span>
+                            </div>
+                        </div>
+                        <div class="file-actions">
+                            <button class="btn btn-primary play-btn" data-id="${file.id}"><i class="fas fa-play"></i> تشغيل</button>
+                            <button class="btn btn-warning rename-btn" data-id="${file.id}"><i class="fas fa-pen"></i> تعديل</button>
+                            <button class="btn btn-danger delete-btn" data-id="${file.id}"><i class="fas fa-trash"></i> حذف</button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            filesListContainer.innerHTML = html;
+
+            // Attach event listeners
+            document.querySelectorAll('.play-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const id = e.currentTarget.dataset.id;
+                    const file = mediaFiles.find(f => f.id === id);
+                    if (file) playMedia(file);
+                });
+            });
+
+            document.querySelectorAll('.rename-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const id = e.currentTarget.dataset.id;
+                    const file = mediaFiles.find(f => f.id === id);
+                    if (file) openRenameModal(file);
+                });
+            });
+
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    const id = e.currentTarget.dataset.id;
+                    if (confirm('حذف هذا الملف نهائياً؟')) {
+                        await deleteFileFromDB(id);
+                        await loadMediaFiles();
+                    }
+                });
+            });
+        }
+
+        // ===================== Media Playback =====================
+        function playMedia(file) {
+            const isVideo = file.type.startsWith('video');
+            playerContainer.innerHTML = isVideo
+                ? `<video id="currentPlayer" src="${file.blobUrl}" controls autoplay></video>`
+                : `<audio id="currentPlayer" src="${file.blobUrl}" controls autoplay></audio>`;
+
+            const player = document.getElementById('currentPlayer');
+            if (file.progress) {
+                player.currentTime = file.progress;
+            }
+            player.addEventListener('timeupdate', () => {
+                updateFileProgress(file.id, player.currentTime);
+            });
+            player.addEventListener('pause', () => {
+                updateFileProgress(file.id, player.currentTime);
+            });
+
+            playerModal.style.display = 'flex';
+        }
+
+        // ===================== Rename Modal =====================
+        function openRenameModal(file) {
+            currentRenameId = file.id;
+            renameInput.value = file.name;
+            renameModal.style.display = 'flex';
+            renameInput.focus();
+            renameInput.select();
+        }
+
+        function closeRenameModal() {
+            renameModal.style.display = 'none';
+            currentRenameId = null;
+        }
+
+        async function handleRename() {
+            const newName = renameInput.value.trim();
+            if (!newName) {
+                alert('الرجاء إدخال اسم');
+                return;
+            }
+            if (!currentRenameId) return;
+            const file = mediaFiles.find(f => f.id === currentRenameId);
+            if (!file) return;
+
+            try {
+                await updateFileNameInDB(currentRenameId, newName);
+                file.name = newName;
+                renderFilesList();
+                updateStats();
+                closeRenameModal();
+            } catch (e) {
+                alert('فشل تعديل الاسم');
+            }
+        }
+
+        // ===================== Load Files from DB =====================
+        async function loadMediaFiles() {
+            try {
+                const files = await getAllFiles();
+                files.forEach(f => {
+                    if (!f.blobUrl && f.data) {
+                        const blob = new Blob([f.data], { type: f.type });
+                        f.blobUrl = URL.createObjectURL(blob);
+                        delete f.data;
+                    }
+                });
+                mediaFiles = files;
+                renderFilesList();
+                updateStats();
+            } catch (e) {
+                alert('حدث خطأ في تحميل الملفات.');
+            }
+        }
+
+        // ===================== Upload with Progress =====================
+        function uploadFileWithProgress(file) {
+            return new Promise(async (resolve, reject) => {
+                const tempId = 'upload_' + Date.now() + Math.random().toString(36);
+                const tempDiv = document.createElement('div');
+                tempDiv.className = 'file-item uploading-item';
+                tempDiv.id = tempId;
+                tempDiv.innerHTML = `
+                    <div class="file-icon"><i class="fas fa-spinner fa-pulse"></i></div>
+                    <div class="file-info">
+                        <div class="file-name">جاري رفع: ${escapeHtml(file.name)}</div>
+                        <div class="progress-area">
+                            <div class="progress-bar-bg">
+                                <div class="progress-bar-fill" style="width:0%"></div>
+                            </div>
+                            <span class="progress-text">0%</span>
+                        </div>
+                    </div>
+                `;
+                filesListContainer.prepend(tempDiv);
+
+                const progressFill = tempDiv.querySelector('.progress-bar-fill');
+                const progressText = tempDiv.querySelector('.progress-text');
+
+                try {
+                    const chunkSize = 1024 * 1024; // 1MB chunks
+                    const chunks = [];
+                    let offset = 0;
+
+                    while (offset < file.size) {
+                        const chunk = file.slice(offset, offset + chunkSize);
+                        const buffer = await chunk.arrayBuffer();
+                        chunks.push(buffer);
+                        offset += chunkSize;
+
+                        const percent = Math.round((offset / file.size) * 100);
+                        progressFill.style.width = percent + '%';
+                        progressText.textContent = percent + '%';
+
+                        await new Promise(r => setTimeout(r, 5)); // small delay for UI update
+                    }
+
+                    // Combine chunks
+                    const totalLength = chunks.reduce((acc, buf) => acc + buf.byteLength, 0);
+                    const combined = new Uint8Array(totalLength);
+                    let pos = 0;
+                    for (const buf of chunks) {
+                        combined.set(new Uint8Array(buf), pos);
+                        pos += buf.byteLength;
+                    }
+
+                    const duration = await getMediaDuration(file);
+
+                    const fileData = {
+                        id: Date.now() + '-' + Math.random().toString(36).substring(2, 10),
+                        name: file.name,
+                        type: file.type,
+                        size: file.size,
+                        duration: duration,
+                        created: Date.now(),
+                        data: combined.buffer
+                    };
+
+                    await saveFile(fileData);
+                    tempDiv.remove();
+                    resolve();
+                } catch (err) {
+                    tempDiv.remove();
+                    reject(err);
+                }
+            });
+        }
+
+        async function handleUpload(files) {
+            for (const file of files) {
+                if (!file.type.startsWith('audio') && !file.type.startsWith('video')) {
+                    alert(`الملف ${file.name} غير مدعوم.`);
+                    continue;
+                }
+                try {
+                    await uploadFileWithProgress(file);
+                } catch (e) {
+                    alert(`فشل رفع ${file.name}`);
+                }
+            }
+            await loadMediaFiles();
+        }
+
+        // ===================== Theme =====================
+        function setTheme(isDark) {
+            if (isDark) {
+                document.body.classList.add('dark');
+                themeToggle.innerHTML = '<i class="fas fa-sun"></i><span>الوضع النهاري</span>';
+                localStorage.setItem('media_theme', 'dark');
+            } else {
+                document.body.classList.remove('dark');
+                themeToggle.innerHTML = '<i class="fas fa-moon"></i><span>الوضع الليلي</span>';
+                localStorage.setItem('media_theme', 'light');
+            }
+        }
+
+        // ===================== Event Listeners =====================
+        uploadZone.addEventListener('click', () => fileInput.click());
+
+        uploadZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadZone.style.borderColor = '#2563eb';
+        });
+
+        uploadZone.addEventListener('dragleave', () => {
+            uploadZone.style.borderColor = '#94a3b8';
+        });
+
+        uploadZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadZone.style.borderColor = '#94a3b8';
+            const files = Array.from(e.dataTransfer.files);
+            if (files.length) handleUpload(files);
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            const files = Array.from(e.target.files);
+            if (files.length) handleUpload(files);
+            fileInput.value = '';
+        });
+
+        searchBtn.addEventListener('click', () => {
+            searchQuery = searchInput.value;
+            renderFilesList();
+        });
+
+        searchInput.addEventListener('keyup', (e) => {
+            if (e.key === 'Enter') {
+                searchQuery = searchInput.value;
+                renderFilesList();
+            }
+        });
+
+        closeModalBtn.addEventListener('click', () => {
+            playerModal.style.display = 'none';
+            playerContainer.innerHTML = '';
+        });
+
+        playerModal.addEventListener('click', (e) => {
+            if (e.target === playerModal) {
+                playerModal.style.display = 'none';
+                playerContainer.innerHTML = '';
+            }
+        });
+
+        closeRenameModalBtn.addEventListener('click', closeRenameModal);
+        cancelRenameBtn.addEventListener('click', closeRenameModal);
+        saveRenameBtn.addEventListener('click', handleRename);
+
+        renameModal.addEventListener('click', (e) => {
+            if (e.target === renameModal) closeRenameModal();
+        });
+
+        renameInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') handleRename();
+        });
+
+        themeToggle.addEventListener('click', () => {
+            setTheme(!document.body.classList.contains('dark'));
+        });
+
+        // ===================== Initialization =====================
+        (async function init() {
+            try {
+                await openDB();
+                await loadMediaFiles();
+
+                const savedTheme = localStorage.getItem('media_theme');
+                if (savedTheme === 'dark') setTheme(true);
+                else setTheme(false);
+            } catch (e) {
+                alert('تعذر فتح قاعدة البيانات.');
+            }
+        })();
+
+    })();
+</script>
+</body>
+</html>
+```       
